@@ -100,7 +100,7 @@ namespace Service.Services
             return refreshToken;
         }
 
-        public ServiceResult<string> RefreshToken(AppUser user, string refreshToken)
+        public ServiceResult<string> RefreshToken(AppUser user, string? refreshToken)
         {
             var oldToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
             if (oldToken != null && !oldToken.IsActive)

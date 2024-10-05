@@ -61,7 +61,7 @@ namespace API.Controllers
             var user = await _userManager.Users.Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(x => x.Id == User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            if (user == null || refreshToken == null) return ErrorResult(ErrorDescriber.Unauthenticated());
+            if (user == null) return ErrorResult(ErrorDescriber.Unauthenticated());
 
             ServiceResult<string> serviceResult = _accountService.RefreshToken(user, refreshToken);
             if (serviceResult.IsError) return HandleServiceResult(serviceResult);

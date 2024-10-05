@@ -11,6 +11,6 @@ namespace Service.Interfaces
         Task<ServiceResult<UserDto>> RegisterAsync(RegisterAttemptDto registerAttempt);
         Task<ServiceResult<UserDto>> GetUserByEmail(string email);
         Task<RefreshToken> SetRefreshToken(string userName);
-        ServiceResult<string> RefreshToken(AppUser user, string refreshToken);
+        ServiceResult<string> RefreshToken(AppUser user, string? refreshToken);
     }
 }
