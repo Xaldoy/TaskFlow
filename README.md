@@ -6,7 +6,7 @@ TaskFlow is a highly customizable and personal task manager app built with ASP.N
 
 ## Planned Features
 
-# Core Features
+### Core Features
 
 -   **User Authentication**: User registration and login functionality using ASP.NET Identity, OAuth integration for social logins (Google, Facebook, etc.).
 -   **Dark/Light Mode**: Toggle between dark and light themes.
@@ -18,7 +18,7 @@ TaskFlow is a highly customizable and personal task manager app built with ASP.N
 -   **Multiple Views**: Different ways of displaying your tasks (list, grid, calendar, kanban, etc.).
 -   **Custom Dashboard Layout**: Create custom page layouts for each dashboard.
 
-# Advanced Features
+### Advanced Features
 
 -   **Smart Scheduling**: Automatically allocate tasks into available calendar slots.
 -   **Automated Workflows**: Conditional workflows (e.g. if Task A is done, Set Task B Prioriy to High).
