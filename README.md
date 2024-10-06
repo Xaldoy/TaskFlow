@@ -21,7 +21,7 @@ TaskFlow is a highly customizable and personal task manager app built with ASP.N
 ### Advanced Features
 
 -   **Smart Scheduling**: Automatically allocate tasks into available calendar slots.
--   **Automated Workflows**: Conditional workflows (e.g. if Task A is done, Set Task B Prioriy to High).
+-   **Automated Workflows**: Conditional workflows (e.g. if Task A is Done, Set Task B Prioriy to High).
 -   **Nested Subtasks**: Unlimited nested tasks for complex hierarchies.
 -   **Custom Reports**: Reports on productivity, completion rates, time spent and similar.
 -   **Task Versioning**: Keep history of task modifications and allow users to revert to previous versions.
