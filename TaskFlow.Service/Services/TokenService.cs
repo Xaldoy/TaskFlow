@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Service.Services
+namespace TaskFlow.Service.Services
 {
     public class TokenService(IConfiguration configuration)
     {

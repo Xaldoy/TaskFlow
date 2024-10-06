@@ -1,8 +1,7 @@
-﻿using DAL.Interfaces;
-using Model;
+﻿using Model;
 using Model.Models;
 
-namespace Repository
+namespace TaskFlow.DAL.Repositories.Authorization
 {
     public class AuthorizationRepository(TaskFlowContext context) : IAuthorizationRepository
     {

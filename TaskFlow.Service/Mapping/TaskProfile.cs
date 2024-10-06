@@ -4,9 +4,9 @@ using Service.DTOs;
 
 namespace Service.Mapping
 {
-    public class AutoMapperProfile : Profile
+    public class TaskProfile : Profile
     {
-        public AutoMapperProfile()
+        public TaskProfile()
         {
             CreateMap<TaskItem, TaskItemDto>()
                 .ForMember(x => x.TaskPriorityName, opt => opt.MapFrom(x => x.TaskPriority != null ? x.TaskPriority.Name : ""));

@@ -3,21 +3,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Model.Models;
-using Service.DTOs;
 using Service.DTOs.Auth;
 using Service.DTOs.Result;
-using Service.Interfaces;
-using Service.Utility;
 using System.Security.Claims;
+using TaskFlow.Service.DTOs.Auth;
+using TaskFlow.Service.DTOs.Error;
+using TaskFlow.Service.Services.Authentication;
 
 namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class AccountController(UserManager<AppUser> userManager, IAccountService accountService) : BaseController
+    public class AccountController(UserManager<AppUser> userManager, IAuthenticationService authenticationService) : BaseController
     {
         private readonly UserManager<AppUser> _userManager = userManager;
-        private readonly IAccountService _accountService = accountService;
+        private readonly IAuthenticationService _authenticationService = authenticationService;
 
         [AllowAnonymous]
         [HttpPost]
@@ -27,7 +27,7 @@ namespace API.Controllers
             if (modelStateErorr != null)
                 return ErrorResult(modelStateErorr);
 
-            ServiceResult<UserDto> serviceResult = await _accountService.LoginAsync(loginAttempt);
+            ServiceResult<AuthResponseDto> serviceResult = await _authenticationService.LoginAsync(loginAttempt);
             return HandleServiceResult(serviceResult);
         }
 
@@ -39,7 +39,7 @@ namespace API.Controllers
             if (modelStateErorr != null)
                 return ErrorResult(modelStateErorr);
 
-            var serviceResult = await _accountService.RegisterAsync(registerAttempt);
+            var serviceResult = await _authenticationService.RegisterAsync(registerAttempt);
             if (serviceResult.Data != null && !serviceResult.IsError) await SetRefreshToken(serviceResult.Data);
             return HandleServiceResult(serviceResult);
         }
@@ -50,7 +50,7 @@ namespace API.Controllers
             var userEmail = User.FindFirstValue("email");
             if (userEmail == null) return ErrorResult(ErrorDescriber.Unauthenticated());
 
-            ServiceResult<UserDto> serviceResult = await _accountService.GetUserByEmail(userEmail);
+            ServiceResult<AuthResponseDto> serviceResult = await _authenticationService.GetUserByEmail(userEmail);
             return HandleServiceResult(serviceResult);
         }
 
@@ -63,10 +63,10 @@ namespace API.Controllers
 
             if (user == null) return ErrorResult(ErrorDescriber.Unauthenticated());
 
-            ServiceResult<string> serviceResult = _accountService.RefreshToken(user, refreshToken);
+            ServiceResult<string> serviceResult = _authenticationService.RefreshToken(user, refreshToken);
             if (serviceResult.IsError) return HandleServiceResult(serviceResult);
 
-            var userDto = new UserDto
+            var userDto = new AuthResponseDto
             {
                 Token = serviceResult.Data,
                 UserName = user.UserName
@@ -75,10 +75,10 @@ namespace API.Controllers
             return Ok(userDto);
         }
 
-        private async Task SetRefreshToken(UserDto user)
+        private async Task SetRefreshToken(AuthResponseDto user)
         {
             if (user.UserName == null) return;
-            var refreshToken = await _accountService.SetRefreshToken(user.UserName);
+            var refreshToken = await _authenticationService.SetRefreshToken(user.UserName);
 
             var cookieOptions = new CookieOptions
             {

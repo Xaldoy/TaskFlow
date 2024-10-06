@@ -1,28 +1,27 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Model.Models;
-using Service.DTOs;
 using Service.DTOs.Auth;
 using Service.DTOs.Result;
-using Service.Interfaces;
-using Service.Utility;
+using TaskFlow.Service.DTOs.Auth;
+using TaskFlow.Service.DTOs.Error;
 
-namespace Service.Services
+namespace TaskFlow.Service.Services.Authentication
 {
-    public class AccountService(UserManager<AppUser> userManager, TokenService tokenService, SignInManager<AppUser> signInManager) : IAccountService
+    public class AuthenticationService(UserManager<AppUser> userManager, TokenService tokenService, SignInManager<AppUser> signInManager) : IAuthenticationService
     {
         private readonly UserManager<AppUser> _userManager = userManager;
         private readonly TokenService _tokenService = tokenService;
         private readonly SignInManager<AppUser> _signInManager = signInManager;
 
-        public async Task<ServiceResult<UserDto>> LoginAsync(LoginAttemptDto loginAttempt)
+        public async Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginAttemptDto loginAttempt)
         {
             var user = await _userManager.FindByEmailAsync(loginAttempt.Credentials);
             user ??= await _userManager.FindByNameAsync(loginAttempt.Credentials);
 
             if (user == null)
             {
-                return ServiceResult<UserDto>.Failure(ErrorDescriber.UserNotFound());
+                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.UserNotFound());
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginAttempt.Password, true);
@@ -32,29 +31,29 @@ namespace Service.Services
                 var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
                 if (!lockoutEnd.HasValue)
                 {
-                    return ServiceResult<UserDto>.Failure(ErrorDescriber.DefaultError());
+                    return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DefaultError());
                 }
-                return ServiceResult<UserDto>.Failure(ErrorDescriber.AccountLockedOut(lockoutEnd.Value));
+                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.AccountLockedOut(lockoutEnd.Value));
             }
 
-            if (!result.Succeeded) return ServiceResult<UserDto>.Failure(ErrorDescriber.PasswordMismatch());
+            if (!result.Succeeded) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.PasswordMismatch());
 
-            var userDto = new UserDto
+            var userDto = new AuthResponseDto
             {
                 UserName = user.UserName,
                 Token = _tokenService.CreateToken(user)
             };
 
-            return ServiceResult<UserDto>.Success(userDto);
+            return ServiceResult<AuthResponseDto>.Success(userDto);
         }
 
-        public async Task<ServiceResult<UserDto>> RegisterAsync(RegisterAttemptDto registerAttempt)
+        public async Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterAttemptDto registerAttempt)
         {
             if (await _userManager.Users.AnyAsync(x => x.UserName == registerAttempt.UserName))
-                return ServiceResult<UserDto>.Failure(ErrorDescriber.DuplicateUsername(registerAttempt.UserName));
+                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DuplicateUsername(registerAttempt.UserName));
 
             if (await _userManager.Users.AnyAsync(x => x.Email == registerAttempt.Email))
-                return ServiceResult<UserDto>.Failure(ErrorDescriber.DuplicateEmail(registerAttempt.Email));
+                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DuplicateEmail(registerAttempt.Email));
 
             var user = new AppUser
             {
@@ -66,27 +65,27 @@ namespace Service.Services
             if (!result.Succeeded && result.Errors.Any())
             {
                 string errorMessage = result.Errors.First().Description;
-                return ServiceResult<UserDto>.Failure(ErrorDescriber.RegistrationError(errorMessage));
+                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.RegistrationError(errorMessage));
             }
 
-            var userDto = new UserDto
+            var userDto = new AuthResponseDto
             {
                 UserName = user.UserName,
                 Token = _tokenService.CreateToken(user)
             };
 
-            return ServiceResult<UserDto>.Success(userDto);
+            return ServiceResult<AuthResponseDto>.Success(userDto);
         }
 
-        public async Task<ServiceResult<UserDto>> GetUserByEmail(string email)
+        public async Task<ServiceResult<AuthResponseDto>> GetUserByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return ServiceResult<UserDto>.Failure(ErrorDescriber.UserNotFound());
-            UserDto userDto = new()
+            if (user == null) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.UserNotFound());
+            AuthResponseDto userDto = new()
             {
                 UserName = user.UserName
             };
-            return ServiceResult<UserDto>.Success(userDto);
+            return ServiceResult<AuthResponseDto>.Success(userDto);
         }
 
         public async Task<RefreshToken> SetRefreshToken(string userName)

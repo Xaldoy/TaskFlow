@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Service.DTOs;
-using Service.Interfaces;
+using TaskFlow.Service.Services.Tasks;
 
 namespace API.Controllers
 {

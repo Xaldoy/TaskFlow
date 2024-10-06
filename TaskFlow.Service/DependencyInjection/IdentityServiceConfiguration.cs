@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Model;
 using Model.Models;
-using Service.Utility;
 using System.Text;
+using TaskFlow.Service.DTOs.Error;
 
 namespace Service
 {
-    public static class IdentityService
+    public static class IdentityServiceConfiguration
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration)
         {

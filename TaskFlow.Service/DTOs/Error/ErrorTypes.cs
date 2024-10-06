@@ -1,4 +1,4 @@
-﻿namespace Service.Utility
+﻿namespace TaskFlow.Service.DTOs.Error
 {
     public static class ErrorTypes
     {

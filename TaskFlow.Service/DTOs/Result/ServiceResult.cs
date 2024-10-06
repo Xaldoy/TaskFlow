@@ -1,6 +1,6 @@
 ﻿using Service.DTOs.Error;
-using Service.Utility;
 using System.Text.Json.Serialization;
+using TaskFlow.Service.DTOs.Error;
 
 namespace Service.DTOs.Result
 {

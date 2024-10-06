@@ -1,6 +1,6 @@
 ﻿using Model.Models;
 
-namespace DAL.Interfaces
+namespace TaskFlow.DAL.Repositories.Tasks
 {
     public interface ITaskRepository
     {
