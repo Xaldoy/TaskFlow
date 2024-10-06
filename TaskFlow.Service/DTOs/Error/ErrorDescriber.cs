@@ -1,6 +1,6 @@
 ﻿using Service.DTOs.Error;
 
-namespace Service.Utility
+namespace TaskFlow.Service.DTOs.Error
 {
     public class ErrorDescriber
     {

@@ -1,7 +1,7 @@
 ﻿using Service.DTOs;
 using Service.DTOs.Result;
 
-namespace Service.Interfaces
+namespace TaskFlow.Service.Services.Tasks
 {
     public interface ITaskService
     {

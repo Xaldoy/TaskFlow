@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
-using DAL.Interfaces;
 using Model.Models;
-using Service.Authorization;
 using Service.DTOs;
 using Service.DTOs.Result;
-using Service.Interfaces;
-using Service.Utility;
+using TaskFlow.DAL.Repositories.Tasks;
+using TaskFlow.Service.DTOs.Error;
+using TaskFlow.Service.Services.Authorization;
 
-namespace Service.Services
+namespace TaskFlow.Service.Services.Tasks
 {
     public class TaskService(IMapper mapper, ITaskRepository taskRepository, IAuthorizationService authorizationService) : ITaskService
     {

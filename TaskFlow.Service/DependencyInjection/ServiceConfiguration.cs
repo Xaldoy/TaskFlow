@@ -1,24 +1,25 @@
-﻿using DAL.Interfaces;
-using DAL.Repositories;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Repository;
-using Service.Authorization;
-using Service.Interfaces;
 using Service.Mapping;
 using System.Threading.RateLimiting;
+using TaskFlow.DAL.Repositories.Authorization;
+using TaskFlow.DAL.Repositories.Tasks;
+using TaskFlow.Service.Services;
+using TaskFlow.Service.Services.Authentication;
+using TaskFlow.Service.Services.Authorization;
+using TaskFlow.Service.Services.Tasks;
 
 namespace Service.Services
 {
-    public static class ConfigureServices
+    public static class ServiceConfiguration
     {
         public static IServiceCollection AddConfiguredServices(this IServiceCollection services, IConfiguration configuration)
         {
 
-            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddCors(opt =>
             {
                 opt.AddPolicy("DevelopmentPolicy", policy =>
@@ -43,7 +44,7 @@ namespace Service.Services
             services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
 
 
-            services.AddAutoMapper(typeof(AutoMapperProfile));
+            services.AddAutoMapper(typeof(TaskProfile));
             services.AddHttpContextAccessor();
 
             services.AddRateLimiter(opt =>

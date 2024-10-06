@@ -1,4 +1,4 @@
-﻿using Service.Utility;
+﻿using TaskFlow.Service.DTOs.Error;
 
 namespace API.Middleware
 {

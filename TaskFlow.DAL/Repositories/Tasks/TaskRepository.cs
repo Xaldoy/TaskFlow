@@ -1,9 +1,8 @@
-﻿using DAL.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Model;
 using Model.Models;
 
-namespace DAL.Repositories
+namespace TaskFlow.DAL.Repositories.Tasks
 {
     public class TaskRepository(TaskFlowContext context) : ITaskRepository
     {
@@ -41,10 +40,7 @@ namespace DAL.Repositories
 
         public async Task DeleteTask(int taskItemId)
         {
-            var taskItem = await _context.TaskItems.FindAsync(taskItemId);
-            if (taskItem == null) return;
-            _context.Remove(taskItem);
-            await _context.SaveChangesAsync();
+            await _context.TaskItems.Where(x => x.Id == taskItemId).ExecuteDeleteAsync();
         }
 
         public async Task<TaskItem> UpdateTask(TaskItem taskItem)
@@ -72,10 +68,7 @@ namespace DAL.Repositories
 
         public async Task DeleteTaskCategory(int categoryId)
         {
-            var category = await _context.TaskCategories.FindAsync(categoryId);
-            if (category == null) return;
-            _context.Remove(category);
-            await _context.SaveChangesAsync();
+            await _context.TaskCategories.Where(x => x.Id == categoryId).ExecuteDeleteAsync();
         }
 
         public async Task<List<TaskPriority>> GetTaskPriorities()

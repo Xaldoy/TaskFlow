@@ -1,6 +1,6 @@
 ﻿using Model.Models;
 
-namespace DAL.Interfaces
+namespace TaskFlow.DAL.Repositories.Authorization
 {
     public interface IAuthorizationRepository
     {
