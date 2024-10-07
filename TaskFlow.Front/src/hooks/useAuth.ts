@@ -46,10 +46,10 @@ const useAuth = () => {
 
     const login = async (loginData: LoginAttempt): Promise<AuthResult> => {
         try {
-            const response = await accountController.Login(loginData);
-            if (response.user) {
-                storeUserInfo(response.user);
-                return response.user;
+            const response: AuthResult = await accountController.Login(loginData);
+            if (response.userName && response.token) {
+                storeUserInfo(response);
+                return response;
             }
             return Promise.reject("Login failed");
         } catch (error) {

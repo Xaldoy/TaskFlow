@@ -82,7 +82,7 @@ namespace API.Controllers
         }
 
         [NonAction]
-        public ErrorResponse? GetModelStateError()
+        public ErrorResponse? GetModelStateError(string? errorType = null )
         {
             if (!ModelState.IsValid && ModelState.Values.Any())
             {
@@ -90,7 +90,8 @@ namespace API.Controllers
                 var modelStateError = modelState.Errors.FirstOrDefault();
                 if (modelStateError != null)
                 {
-                    return ErrorDescriber.InvalidModelState(modelStateError.ErrorMessage);
+                    if (errorType != null) return ErrorDescriber.InvalidModelState(modelStateError.ErrorMessage, errorType);
+                    return ErrorDescriber.InvalidModelState(modelStateError.ErrorMessage );
                 }
             }
             return null;

@@ -23,7 +23,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginAttemptDto loginAttempt)
         {
-            var modelStateErorr = GetModelStateError();
+            var modelStateErorr = GetModelStateError(ErrorTypes.AuthenticationError);
             if (modelStateErorr != null)
                 return ErrorResult(modelStateErorr);
 
@@ -35,7 +35,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterAttemptDto registerAttempt)
         {
-            var modelStateErorr = GetModelStateError();
+            var modelStateErorr = GetModelStateError(ErrorTypes.AuthenticationError);
             if (modelStateErorr != null)
                 return ErrorResult(modelStateErorr);
 
