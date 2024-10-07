@@ -22,6 +22,22 @@ const useAuth = () => {
         }
     };
 
+    const handleUserLoggedInCheck = () => {
+        const token = getToken();
+        const username = getLoggedInUsername();
+        if (!username || !token || !isTokenValid(token)) {
+            clearAuthData();
+            globalContext.setLoggedInUser(undefined);
+            return false;
+        } else {
+            globalContext.setLoggedInUser({
+                token: token,
+                userName: username
+            } as AuthResult)
+        }
+        return true;
+    }
+
     const getToken = (): string | null => {
         return localStorage.getItem(TOKEN_KEY);
     };
@@ -33,15 +49,6 @@ const useAuth = () => {
     const clearAuthData = () => {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USERNAME_KEY);
-    };
-
-    const isLoggedIn = (): boolean => {
-        const token = getToken();
-        if (!token || !isTokenValid(token)) {
-            clearAuthData();
-            return false;
-        }
-        return true;
     };
 
     const login = async (loginData: LoginAttempt): Promise<AuthResult> => {
@@ -77,11 +84,11 @@ const useAuth = () => {
         }
     };
 
-    const storeUserInfo = (user: AuthResult) => {
-        if (user?.token && user?.userName) {
-            setToken(user.token);
-            localStorage.setItem(USERNAME_KEY, user.userName);
-            globalContext.setLoggedInUser({ userName: user.userName });
+    const storeUserInfo = (authResult: AuthResult) => {
+        if (authResult?.token && authResult?.userName) {
+            setToken(authResult.token);
+            localStorage.setItem(USERNAME_KEY, authResult.userName);
+            globalContext.setLoggedInUser({ userName: authResult.userName });
         }
     };
 
@@ -124,7 +131,7 @@ const useAuth = () => {
         logout,
         register,
         getLoggedInUsername,
-        isLoggedIn,
+        handleUserLoggedInCheck,
         validateEmail: (email: string) => validate("email", email),
         validatePassword: (password: string) => validate("password", password),
     };
