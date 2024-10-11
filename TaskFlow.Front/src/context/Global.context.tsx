@@ -18,9 +18,9 @@ interface GlobalContextProps {
 
 const GlobalContext = createContext<GlobalContextProps>({
     loggedInUser: undefined,
-    setLoggedInUser: () => {},
+    setLoggedInUser: () => { },
     pageIsLoading: false,
-    setPageIsLoading: () => {},
+    setPageIsLoading: () => { },
 });
 
 interface ProviderProps {
