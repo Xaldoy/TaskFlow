@@ -8,6 +8,7 @@ using Service.DTOs.Result;
 using System.Security.Claims;
 using TaskFlow.Service.DTOs.Auth;
 using TaskFlow.Service.DTOs.Error;
+using TaskFlow.Service.DTOs.Error.Constants;
 using TaskFlow.Service.Services.Authentication;
 
 namespace API.Controllers
@@ -23,9 +24,9 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginAttemptDto loginAttempt)
         {
-            var modelStateErorr = GetModelStateError(ErrorTypes.AuthenticationError);
+            var modelStateErorr = GetModelStateError(MessageTypes.AuthenticationError);
             if (modelStateErorr != null)
-                return ErrorResult(modelStateErorr);
+                return MessageResult(modelStateErorr);
 
             ServiceResult<AuthResponseDto> serviceResult = await _authenticationService.LoginAsync(loginAttempt);
             return HandleServiceResult(serviceResult);
@@ -35,9 +36,9 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterAttemptDto registerAttempt)
         {
-            var modelStateErorr = GetModelStateError(ErrorTypes.AuthenticationError);
+            var modelStateErorr = GetModelStateError(MessageTypes.AuthenticationError);
             if (modelStateErorr != null)
-                return ErrorResult(modelStateErorr);
+                return MessageResult(modelStateErorr);
 
             var serviceResult = await _authenticationService.RegisterAsync(registerAttempt);
             if (serviceResult.Data != null && !serviceResult.IsError) await SetRefreshToken(serviceResult.Data);
@@ -47,8 +48,8 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var userEmail = User.FindFirstValue("email");
-            if (userEmail == null) return ErrorResult(ErrorDescriber.Unauthenticated());
+            var userEmail = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
+            if (userEmail == null) return MessageResult(MessageDescriber.Unauthenticated());
 
             ServiceResult<AuthResponseDto> serviceResult = await _authenticationService.GetUserByEmail(userEmail);
             return HandleServiceResult(serviceResult);
@@ -61,7 +62,7 @@ namespace API.Controllers
             var user = await _userManager.Users.Include(x => x.RefreshTokens)
                 .FirstOrDefaultAsync(x => x.Id == User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            if (user == null) return ErrorResult(ErrorDescriber.Unauthenticated());
+            if (user == null) return MessageResult(MessageDescriber.Unauthenticated());
 
             ServiceResult<string> serviceResult = _authenticationService.RefreshToken(user, refreshToken);
             if (serviceResult.IsError) return HandleServiceResult(serviceResult);
