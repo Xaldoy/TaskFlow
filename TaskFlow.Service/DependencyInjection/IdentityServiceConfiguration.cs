@@ -13,7 +13,7 @@ namespace Service
 {
     public static class IdentityServiceConfiguration
     {
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration _configuration)
         {
             services.AddIdentityCore<AppUser>(options =>
             {
@@ -30,18 +30,21 @@ namespace Service
             })
             .AddEntityFrameworkStores<TaskFlowContext>();
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!));
-
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
             {
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));
+
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = key,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
+
+                    IssuerSigningKey = key,
+                    ValidIssuer = _configuration["JwtSettings:Issuer"],
+                    ValidAudience = _configuration["JwtSettings:Audience"],
+                    ClockSkew = TimeSpan.FromMinutes(5),
                 };
                 opt.Events = new JwtBearerEvents
                 {
@@ -49,20 +52,20 @@ namespace Service
                     {
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsJsonAsync(ErrorDescriber.Unauthenticated());
+                        await context.Response.WriteAsJsonAsync(MessageDescriber.Unauthenticated());
                     },
                     OnForbidden = async context =>
                     {
                         context.Response.StatusCode = StatusCodes.Status403Forbidden;
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsJsonAsync(ErrorDescriber.Unauthorized());
+                        await context.Response.WriteAsJsonAsync(MessageDescriber.Unauthorized());
                     },
                     OnChallenge = async context =>
                     {
                         context.HandleResponse();
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsJsonAsync(ErrorDescriber.Unauthenticated());
+                        await context.Response.WriteAsJsonAsync("THIS " + MessageDescriber.DefaultError());
                     }
                 };
             });

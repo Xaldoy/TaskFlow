@@ -21,7 +21,7 @@ namespace TaskFlow.Service.Services.Authentication
 
             if (user == null)
             {
-                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.UserNotFound());
+                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.UserNotFound());
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginAttempt.Password, true);
@@ -31,12 +31,12 @@ namespace TaskFlow.Service.Services.Authentication
                 var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
                 if (!lockoutEnd.HasValue)
                 {
-                    return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DefaultError());
+                    return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
                 }
-                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.AccountLockedOut(lockoutEnd.Value));
+                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.AccountLockedOut(lockoutEnd.Value));
             }
 
-            if (!result.Succeeded) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.PasswordMismatch());
+            if (!result.Succeeded) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.PasswordMismatch());
 
             var userDto = new AuthResponseDto
             {
@@ -50,10 +50,10 @@ namespace TaskFlow.Service.Services.Authentication
         public async Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterAttemptDto registerAttempt)
         {
             if (await _userManager.Users.AnyAsync(x => x.UserName == registerAttempt.UserName))
-                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DuplicateUsername(registerAttempt.UserName));
+                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DuplicateUsername(registerAttempt.UserName));
 
             if (await _userManager.Users.AnyAsync(x => x.Email == registerAttempt.Email))
-                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DuplicateEmail(registerAttempt.Email));
+                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DuplicateEmail(registerAttempt.Email));
 
             var user = new AppUser
             {
@@ -65,7 +65,7 @@ namespace TaskFlow.Service.Services.Authentication
             if (!result.Succeeded && result.Errors.Any())
             {
                 string errorMessage = result.Errors.First().Description;
-                return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.RegistrationError(errorMessage));
+                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.RegistrationError(errorMessage));
             }
 
             var userDto = new AuthResponseDto
@@ -80,7 +80,7 @@ namespace TaskFlow.Service.Services.Authentication
         public async Task<ServiceResult<AuthResponseDto>> GetUserByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.UserNotFound());
+            if (user == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.UserNotFound());
             AuthResponseDto userDto = new()
             {
                 UserName = user.UserName
@@ -103,12 +103,12 @@ namespace TaskFlow.Service.Services.Authentication
         {
             var oldToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
             if (oldToken != null && !oldToken.IsActive)
-                return ServiceResult<string>.Failure(ErrorDescriber.Unauthenticated());
+                return ServiceResult<string>.Failure(MessageDescriber.Unauthenticated());
 
             if (oldToken != null) oldToken.Revoked = DateTime.UtcNow;
             var newToken = _tokenService.CreateToken(user);
             if (newToken == null)
-                return ServiceResult<string>.Failure(ErrorDescriber.Unauthenticated());
+                return ServiceResult<string>.Failure(MessageDescriber.Unauthenticated());
 
             return ServiceResult<string>.Success(newToken);
         }

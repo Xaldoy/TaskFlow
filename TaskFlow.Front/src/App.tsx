@@ -1,36 +1,21 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import "./App.css";
-import LoginAttempt from "./models/LoginAttempt";
+import AuthForm from "./components/auth/AuthForm";
+import { GlobalContextProvider } from "./context/Global.context";
 import useAuth from "./hooks/useAuth";
 
 function App() {
-    const [loginAttempt, setLoginAttempt] = useState<LoginAttempt>({
-        credentials: "",
-        password: "",
-    });
 
     const auth = useAuth();
 
+    useEffect(() => {
+        auth.handleUserLoggedInCheck();
+    }, [])
+
     return (
-        <>
-            <input
-                onChange={(e) =>
-                    setLoginAttempt((prev: LoginAttempt) => ({
-                        ...prev,
-                        credentials: e.target.value,
-                    }))
-                }
-            />
-            <input
-                onChange={(e) =>
-                    setLoginAttempt((prev: LoginAttempt) => ({
-                        ...prev,
-                        password: e.target.value,
-                    }))
-                }
-            />
-            <button onClick={() => auth.login(loginAttempt)}>Login</button>
-        </>
+        <div className="appContainer">
+            <AuthForm />
+        </div>
     );
 }
 

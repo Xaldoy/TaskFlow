@@ -8,38 +8,38 @@ namespace API.Controllers
     public class BaseController : ControllerBase
     {
         [NonAction]
-        public IActionResult ErrorResult(ErrorResponse errorResponse)
+        public IActionResult MessageResult(MessageResponse messageResponse)
         {
-            switch (errorResponse.ErrorCode)
+            switch (messageResponse.MessageCode)
             {
                 #region Client Errors (4xx)
 
                 #region 400 Bad Request
-                case ErrorCode.RegistrationError:
-                case ErrorCode.InvalidModelState:
-                    return StatusCode(400, errorResponse);
+                case MessageCode.RegistrationError:
+                case MessageCode.InvalidModelState:
+                    return StatusCode(400, messageResponse);
                 #endregion
 
                 #region 401 Unauthorized
-                case ErrorCode.PasswordMismatch:
-                case ErrorCode.Unauthenticated:
-                    return StatusCode(401, errorResponse);
+                case MessageCode.PasswordMismatch:
+                case MessageCode.Unauthenticated:
+                    return StatusCode(401, messageResponse);
                 #endregion
 
                 #region 403 Forbidden
-                case ErrorCode.AccountLockedOut:
-                case ErrorCode.Unauthorized:
-                    return StatusCode(403, errorResponse);
+                case MessageCode.AccountLockedOut:
+                case MessageCode.Unauthorized:
+                    return StatusCode(403, messageResponse);
                 #endregion
 
                 #region 404 Not Found
-                case ErrorCode.UserNotFound:
-                    return StatusCode(404, errorResponse);
+                case MessageCode.UserNotFound:
+                    return StatusCode(404, messageResponse);
                 #endregion
 
                 #region 405 Method Not Allowed
-                case ErrorCode.MethodNotAllowed:
-                    return StatusCode(405, errorResponse);
+                case MessageCode.MethodNotAllowed:
+                    return StatusCode(405, messageResponse);
                 #endregion
 
                 #endregion
@@ -47,9 +47,9 @@ namespace API.Controllers
                 #region Conflict Errors (409)
 
                 #region 409 Conflict
-                case ErrorCode.DuplicateUsername:
-                case ErrorCode.DuplicateEmail:
-                    return StatusCode(409, errorResponse);
+                case MessageCode.DuplicateUsername:
+                case MessageCode.DuplicateEmail:
+                    return StatusCode(409, messageResponse);
                 #endregion
 
                 #endregion
@@ -57,9 +57,9 @@ namespace API.Controllers
                 #region Server Errors (5xx)
 
                 #region 500 Internal Server Error
-                case ErrorCode.DefaultError:
+                case MessageCode.DefaultError:
                 default:
-                    return StatusCode(500, errorResponse);
+                    return StatusCode(500, messageResponse);
                     #endregion
 
                     #endregion
@@ -70,19 +70,19 @@ namespace API.Controllers
         [NonAction]
         public IActionResult HandleServiceResult<T>(ServiceResult<T> serviceResult)
         {
-            if (serviceResult.Error != null) return ErrorResult(serviceResult.Error);
+            if (serviceResult.Message != null && serviceResult.IsError) return MessageResult(serviceResult.Message);
             return Ok(serviceResult.Data);
         }
 
         [NonAction]
         public IActionResult HandleServiceResult(ServiceResult serviceResult)
         {
-            if (serviceResult.Error != null) return ErrorResult(serviceResult.Error);
-            return ErrorResult(ErrorDescriber.DefaultError());
+            if (serviceResult.Message != null && serviceResult.IsError) return MessageResult(serviceResult.Message);
+            return MessageResult(MessageDescriber.DefaultError());
         }
 
         [NonAction]
-        public ErrorResponse? GetModelStateError()
+        public MessageResponse? GetModelStateError(MessageType? messageType = null )
         {
             if (!ModelState.IsValid && ModelState.Values.Any())
             {
@@ -90,7 +90,7 @@ namespace API.Controllers
                 var modelStateError = modelState.Errors.FirstOrDefault();
                 if (modelStateError != null)
                 {
-                    return ErrorDescriber.InvalidModelState(modelStateError.ErrorMessage);
+                    return MessageDescriber.InvalidModelState(modelStateError.ErrorMessage, messageType ?? MessageTypes.GlobalError);
                 }
             }
             return null;

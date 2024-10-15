@@ -22,7 +22,7 @@ namespace API.Middleware
                     if (!httpContext.Response.HasStarted)
                     {
                         httpContext.Response.ContentType = "application/json";
-                        await httpContext.Response.WriteAsJsonAsync(ErrorDescriber.MethodNotAllowed());
+                        await httpContext.Response.WriteAsJsonAsync(MessageDescriber.MethodNotAllowed());
                     }
                 }
             }
@@ -32,7 +32,7 @@ namespace API.Middleware
                 {
                     httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     httpContext.Response.ContentType = "application/json";
-                    await httpContext.Response.WriteAsJsonAsync(ErrorDescriber.DefaultError(ex.Message));
+                    await httpContext.Response.WriteAsJsonAsync(MessageDescriber.DefaultError(ex.Message));
                 }
             }
         }
