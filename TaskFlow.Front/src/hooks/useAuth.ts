@@ -1,61 +1,24 @@
 import { useGlobalContext } from "../context/Global.context";
-import { jwtDecode } from "jwt-decode";
 import AuthResult from "../models/AuthResult";
 import LoginAttempt from "../models/LoginAttempt";
 import RegisterAttempt from "../models/RegisterAttempt";
 import accountController from "../api/controllers/AccountController";
 
 // Utility for localStorage keys
-const TOKEN_KEY = "token";
 const USERNAME_KEY = "username";
 
 const useAuth = () => {
     const globalContext = useGlobalContext();
 
-    // Utility to handle token expiration
-    const isTokenValid = (token: string): boolean => {
-        try {
-            const { exp }: any = jwtDecode(token);
-            return exp && exp * 1000 > Date.now();
-        } catch (error) {
-            return false;
-        }
-    };
-
     const handleUserLoggedInCheck = () => {
-        const token = getToken();
-        const username = getLoggedInUsername();
-        if (!username || !token || !isTokenValid(token)) {
-            clearAuthData();
-            globalContext.setLoggedInUser(undefined);
-            return false;
-        } else {
-            globalContext.setLoggedInUser({
-                token: token,
-                userName: username
-            } as AuthResult)
-        }
-        return true;
+        return globalContext.loggedInUser !== undefined;
     }
-
-    const getToken = (): string | null => {
-        return localStorage.getItem(TOKEN_KEY);
-    };
-
-    const setToken = (token: string) => {
-        localStorage.setItem(TOKEN_KEY, token);
-    };
-
-    const clearAuthData = () => {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USERNAME_KEY);
-    };
 
     const login = async (loginData: LoginAttempt): Promise<AuthResult> => {
         try {
             const response: AuthResult = await accountController.Login(loginData);
-            if (response.userName && response.token) {
-                storeUserInfo(response);
+            if (response.userName) {
+                setAuthData(response);
                 return response;
             }
             return Promise.reject("Login failed");
@@ -73,10 +36,10 @@ const useAuth = () => {
         registerData: RegisterAttempt
     ): Promise<AuthResult> => {
         try {
-            const response = await accountController.Register(registerData);
-            if (response.user) {
-                storeUserInfo(response.user);
-                return response.user;
+            const response: AuthResult = await accountController.Register(registerData);
+            if (response.userName) {
+                setAuthData(response);
+                return response;
             }
             return Promise.reject("Registration failed");
         } catch (error) {
@@ -84,15 +47,19 @@ const useAuth = () => {
         }
     };
 
-    const storeUserInfo = (authResult: AuthResult) => {
-        if (authResult?.token && authResult?.userName) {
-            setToken(authResult.token);
+    const setAuthData = (authResult: AuthResult) => {
+        if (authResult?.userName) {
             localStorage.setItem(USERNAME_KEY, authResult.userName);
             globalContext.setLoggedInUser({ userName: authResult.userName });
         }
     };
 
-    const getLoggedInUsername = (): string | null => {
+    const clearAuthData = () => {
+        localStorage.removeItem(USERNAME_KEY);
+        globalContext.setLoggedInUser(undefined)
+    }
+
+    const getCurrentUserName = (): string | null => {
         return localStorage.getItem(USERNAME_KEY);
     };
 
@@ -130,7 +97,7 @@ const useAuth = () => {
         login,
         logout,
         register,
-        getLoggedInUsername,
+        getCurrentUserName,
         handleUserLoggedInCheck,
         validateEmail: (email: string) => validate("email", email),
         validatePassword: (password: string) => validate("password", password),

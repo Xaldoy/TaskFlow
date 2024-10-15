@@ -82,11 +82,11 @@ const requests = {
         );
         return response.data;
     },
-    post: async (endpoint: string, data: any, loading: boolean = false) => {
+    post: async (endpoint: string, data: any, loading: boolean = false, withCredentials: boolean = false) => {
         const response = await axios.post(
             `${import.meta.env.VITE_REACT_API_URL}${endpoint}`,
             data,
-            { loading } as RequestInjector
+            { loading, withCredentials } as RequestInjector
         );
         return response.data;
     },
@@ -100,8 +100,8 @@ const requests = {
     getWithLoading: async (endpoint: string) => {
         return requests.get(endpoint, true);
     },
-    postWithLoading: async (endpoint: string, data: any) => {
-        return requests.post(endpoint, data, true);
+    postWithLoading: async (endpoint: string, data: any, withCredentials: boolean = false) => {
+        return requests.post(endpoint, data, true, withCredentials);
     },
     deleteWithLoading: async (endpoint: string) => {
         return requests.delete(endpoint, true);

@@ -21,9 +21,6 @@ const LoginForm = observer(() => {
     const handleLogin = async (loginAttempt: LoginAttempt) => {
         errorStore.removeErrors(ErrorTypes.AuthenticationError);
         const authResult: AuthResult = await auth.login(loginAttempt);
-        if (authResult.token) {
-            alert("Correct")
-        }
     }
 
     const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
