@@ -11,7 +11,10 @@ const useAuth = () => {
     const globalContext = useGlobalContext();
 
     const handleUserLoggedInCheck = () => {
-        return globalContext.loggedInUser !== undefined;
+        const userName = localStorage.getItem(USERNAME_KEY);
+        if (userName !== null) {
+            globalContext.setLoggedInUser({ userName: userName })
+        }
     }
 
     const login = async (loginData: LoginAttempt): Promise<AuthResult> => {

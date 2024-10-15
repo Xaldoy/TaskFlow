@@ -22,18 +22,17 @@ namespace Service.Services
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddCors(opt =>
             {
-                opt.AddPolicy("DevelopmentPolicy", policy =>
+                var allowedHosts = configuration.GetValue<string?>("AllowedHosts");
+                var origins = allowedHosts?.Split(';', StringSplitOptions.RemoveEmptyEntries)
+                  ?? [];
+
+                opt.AddPolicy("CorsPolicy", policy =>
                 {
                     policy
-                       .WithOrigins(configuration.GetValue<string>("AllowedHosts") ?? "*")
                        .AllowAnyHeader()
-                       .AllowAnyMethod();
-                });
-                opt.AddPolicy("ProductionPolicy", policy =>
-                {
-                    policy.WithOrigins("https://taskflowapp.duckdns.org")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
+                       .AllowAnyMethod()
+                       .AllowCredentials()
+                       .WithOrigins(origins);
                 });
             });
 

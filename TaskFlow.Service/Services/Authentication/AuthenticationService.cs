@@ -44,14 +44,14 @@ namespace TaskFlow.Service.Services.Authentication
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(6),
             };
 
             string? token = _tokenService.CreateToken(user);
             var httpContext = _httpContextAccessor.HttpContext;
 
-            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DefaultError());
+            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
 
             httpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
 
@@ -95,7 +95,7 @@ namespace TaskFlow.Service.Services.Authentication
             string? token = _tokenService.CreateToken(user);
             var httpContext = _httpContextAccessor.HttpContext;
 
-            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DefaultError());
+            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
 
             httpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
 
