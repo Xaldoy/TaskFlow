@@ -43,6 +43,16 @@ class ErrorStore {
         );
     }
 
+    addAuthError(message: string) {
+        const newError: RequestError = {
+            errorType: ErrorTypes.AuthenticationError,
+            errorMessage: message,
+            errorCode: "AuthError"
+        }
+
+        this.addError(newError);
+    }
+
     scheduleErrorRemoval(error: RequestError, timeout: number) {
         setTimeout(() => {
             this.removeErrors(ErrorTypes.GlobalError, error.errorCode);

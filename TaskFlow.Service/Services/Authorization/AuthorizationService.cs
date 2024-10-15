@@ -45,7 +45,7 @@ namespace TaskFlow.Service.Services.Authorization
 
             if (userIdClaim == null)
             {
-                return ServiceResult<string>.Failure(ErrorDescriber.Unauthenticated());
+                return ServiceResult<string>.Failure(MessageDescriber.Unauthenticated());
             }
 
             return ServiceResult<string>.Success(userIdClaim.Value);
