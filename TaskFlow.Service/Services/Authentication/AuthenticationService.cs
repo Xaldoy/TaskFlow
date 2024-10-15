@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Model.Models;
 using Service.DTOs.Auth;
@@ -8,11 +9,12 @@ using TaskFlow.Service.DTOs.Error;
 
 namespace TaskFlow.Service.Services.Authentication
 {
-    public class AuthenticationService(UserManager<AppUser> userManager, TokenService tokenService, SignInManager<AppUser> signInManager) : IAuthenticationService
+    public class AuthenticationService(UserManager<AppUser> userManager, TokenService tokenService, SignInManager<AppUser> signInManager, IHttpContextAccessor httpContextAccessor) : IAuthenticationService
     {
         private readonly UserManager<AppUser> _userManager = userManager;
         private readonly TokenService _tokenService = tokenService;
         private readonly SignInManager<AppUser> _signInManager = signInManager;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
         public async Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginAttemptDto loginAttempt)
         {
@@ -38,10 +40,24 @@ namespace TaskFlow.Service.Services.Authentication
 
             if (!result.Succeeded) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.PasswordMismatch());
 
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(6),
+            };
+
+            string? token = _tokenService.CreateToken(user);
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DefaultError());
+
+            httpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
+
             var userDto = new AuthResponseDto
             {
                 UserName = user.UserName,
-                Token = _tokenService.CreateToken(user)
             };
 
             return ServiceResult<AuthResponseDto>.Success(userDto);
@@ -68,10 +84,24 @@ namespace TaskFlow.Service.Services.Authentication
                 return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.RegistrationError(errorMessage));
             }
 
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(6),
+            };
+
+            string? token = _tokenService.CreateToken(user);
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(ErrorDescriber.DefaultError());
+
+            httpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
+
             var userDto = new AuthResponseDto
             {
                 UserName = user.UserName,
-                Token = _tokenService.CreateToken(user)
             };
 
             return ServiceResult<AuthResponseDto>.Success(userDto);

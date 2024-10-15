@@ -69,7 +69,6 @@ namespace API.Controllers
 
             var userDto = new AuthResponseDto
             {
-                Token = serviceResult.Data,
                 UserName = user.UserName
             };
 
