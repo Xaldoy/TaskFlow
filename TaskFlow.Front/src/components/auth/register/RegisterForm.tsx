@@ -6,10 +6,12 @@ import errorStore from "../../../stores/ErrorStore";
 import { ErrorTypes } from "../../../enums/ErrorTypes";
 import AuthResult from "../../../models/AuthResult";
 import { TextInputField, Button } from "evergreen-ui";
+import { useNavigate } from "react-router-dom";
 
 const RegisterForm = observer(() => {
 
     const auth = useAuth();
+    const navigate = useNavigate();
 
     const [registerAttempt, setRegisterAttempt] = useState<RegisterAttempt>(
         {
@@ -22,8 +24,8 @@ const RegisterForm = observer(() => {
     const handleRegister = async (registerAttempt: RegisterAttempt) => {
         errorStore.removeErrors(ErrorTypes.AuthenticationError);
         const authResult: AuthResult = await auth.register(registerAttempt);
-        if (authResult.token) {
-            alert("Registered");
+        if (authResult.userName) {
+            navigate("/dashboard")
         }
     }
 

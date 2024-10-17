@@ -107,6 +107,27 @@ namespace TaskFlow.Service.Services.Authentication
             return ServiceResult<AuthResponseDto>.Success(userDto);
         }
 
+        public async Task<ServiceResult<AuthResponseDto>> Logout()
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(-1),
+            };
+
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if (httpContext == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
+
+            httpContext.Response.Cookies.Append("AuthToken", "", cookieOptions);
+
+            var userDto = new AuthResponseDto();
+
+            return ServiceResult<AuthResponseDto>.Success(userDto);
+        }
+
         public async Task<ServiceResult<AuthResponseDto>> GetUserByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);

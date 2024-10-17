@@ -45,6 +45,13 @@ namespace API.Controllers
             return HandleServiceResult(serviceResult);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            var serviceResult = await _authenticationService.Logout();
+            return HandleServiceResult(serviceResult);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetCurrentUser()
         {

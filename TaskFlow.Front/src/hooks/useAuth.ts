@@ -12,8 +12,13 @@ const useAuth = () => {
 
     const handleUserLoggedInCheck = () => {
         const userName = localStorage.getItem(USERNAME_KEY);
+        console.log(userName);
         if (userName !== null) {
             globalContext.setLoggedInUser({ userName: userName })
+            globalContext.setIsUserLoggedIn(true);
+        } else {
+            globalContext.setLoggedInUser(undefined);
+            globalContext.setIsUserLoggedIn(false);
         }
     }
 
@@ -30,9 +35,9 @@ const useAuth = () => {
         }
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await accountController.Logout();
         clearAuthData();
-        globalContext.setLoggedInUser(undefined);
     };
 
     const register = async (
@@ -54,12 +59,14 @@ const useAuth = () => {
         if (authResult?.userName) {
             localStorage.setItem(USERNAME_KEY, authResult.userName);
             globalContext.setLoggedInUser({ userName: authResult.userName });
+            globalContext.setIsUserLoggedIn(true);
         }
     };
 
     const clearAuthData = () => {
         localStorage.removeItem(USERNAME_KEY);
         globalContext.setLoggedInUser(undefined)
+        globalContext.setIsUserLoggedIn(false);
     }
 
     const getCurrentUserName = (): string | null => {

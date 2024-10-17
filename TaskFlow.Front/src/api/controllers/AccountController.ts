@@ -4,10 +4,13 @@ import requests from "../agent";
 
 const accountController = {
     Login: async (loginAttempt: LoginAttempt) => {
-        return await requests.postWithLoading("/Account/Login", loginAttempt, true);
+        return await requests.postWithLoading("/Account/Login", loginAttempt);
     },
     Register: async (registerAttempt: RegisterAttempt) => {
-        return await requests.postWithLoading("/Account/Register", registerAttempt, true);
+        return await requests.postWithLoading("/Account/Register", registerAttempt);
+    },
+    Logout: async () => {
+        return await requests.postWithLoading("/Account/Logout", {});
     },
     GetCurrentUser: async () => {
         return await requests.get("/Account/GetCurrentUser");

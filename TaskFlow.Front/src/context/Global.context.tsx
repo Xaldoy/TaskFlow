@@ -10,6 +10,8 @@ import {
 import AuthResult from "../models/AuthResult";
 
 interface GlobalContextProps {
+    userIsLoggedIn: boolean | undefined;
+    setIsUserLoggedIn: Dispatch<SetStateAction<boolean | undefined>>;
     loggedInUser: AuthResult | undefined;
     setLoggedInUser: Dispatch<SetStateAction<AuthResult | undefined>>;
     pageIsLoading: boolean;
@@ -18,6 +20,8 @@ interface GlobalContextProps {
 
 const GlobalContext = createContext<GlobalContextProps>({
     loggedInUser: undefined,
+    setIsUserLoggedIn: () => { },
+    userIsLoggedIn: undefined,
     setLoggedInUser: () => { },
     pageIsLoading: false,
     setPageIsLoading: () => { },
@@ -34,9 +38,12 @@ export const useGlobalContext = () => {
 export function GlobalContextProvider({ children }: ProviderProps) {
     const [loggedInUser, setLoggedInUser] = useState<AuthResult>();
     const [pageIsLoading, setPageIsLoading] = useState(false);
+    const [userIsLoggedIn, setIsUserLoggedIn] = useState<boolean>();
     return (
         <GlobalContext.Provider
             value={{
+                userIsLoggedIn,
+                setIsUserLoggedIn,
                 loggedInUser,
                 setLoggedInUser,
                 pageIsLoading,

@@ -6,10 +6,12 @@ import errorStore from "../../../stores/ErrorStore";
 import { ErrorTypes } from "../../../enums/ErrorTypes";
 import useAuth from "../../../hooks/useAuth";
 import AuthResult from "../../../models/AuthResult";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = observer(() => {
 
     const auth = useAuth();
+    const navigate = useNavigate();
 
     const [loginAttempt, setLoginAttempt] = useState<LoginAttempt>(
         {
@@ -21,6 +23,9 @@ const LoginForm = observer(() => {
     const handleLogin = async (loginAttempt: LoginAttempt) => {
         errorStore.removeErrors(ErrorTypes.AuthenticationError);
         const authResult: AuthResult = await auth.login(loginAttempt);
+        if (authResult.userName) {
+            navigate("/dashboard")
+        }
     }
 
     const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
