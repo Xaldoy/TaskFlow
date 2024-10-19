@@ -32,7 +32,7 @@ namespace TaskFlow.Service.Services
                 Subject = new ClaimsIdentity(claims),
                 Issuer = _configuration["JwtSettings:Issuer"],
                 Audience = _configuration["JwtSettings:Audience"],
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(6),
                 SigningCredentials = creds,
             };
 

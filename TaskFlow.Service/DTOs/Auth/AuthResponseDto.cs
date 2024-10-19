@@ -1,4 +1,6 @@
-﻿namespace TaskFlow.Service.DTOs.Auth
+﻿using System.Text.Json.Serialization;
+
+namespace TaskFlow.Service.DTOs.Auth
 {
     public class AuthResponseDto
     {
