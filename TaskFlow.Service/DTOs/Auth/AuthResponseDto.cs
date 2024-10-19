@@ -2,9 +2,9 @@
 
 namespace TaskFlow.Service.DTOs.Auth
 {
-    public class AuthResponseDto
+    public class AuthResponseDto : BaseDto
     {
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string? UserName { get; set; } = string.Empty;
+        public string? Username { get; set; } = string.Empty;
     }
 }

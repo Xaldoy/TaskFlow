@@ -5,7 +5,7 @@ using Model.Models;
 using Service.DTOs.Auth;
 using Service.DTOs.Result;
 using TaskFlow.Service.DTOs.Auth;
-using TaskFlow.Service.DTOs.Error;
+using TaskFlow.Service.DTOs.Message;
 
 namespace TaskFlow.Service.Services.Authentication
 {
@@ -16,14 +16,14 @@ namespace TaskFlow.Service.Services.Authentication
         private readonly SignInManager<AppUser> _signInManager = signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
-        public async Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginAttemptDto loginAttempt)
+        public async Task<ServiceResult> LoginAsync(LoginAttemptDto loginAttempt)
         {
             var user = await _userManager.FindByEmailAsync(loginAttempt.Credentials);
             user ??= await _userManager.FindByNameAsync(loginAttempt.Credentials);
 
             if (user == null)
             {
-                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.UserNotFound());
+                return ServiceResult.Failure(MessageDescriber.UserNotFound());
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginAttempt.Password, true);
@@ -33,12 +33,12 @@ namespace TaskFlow.Service.Services.Authentication
                 var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
                 if (!lockoutEnd.HasValue)
                 {
-                    return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
+                    return ServiceResult.Failure(MessageDescriber.DefaultError());
                 }
-                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.AccountLockedOut(lockoutEnd.Value));
+                return ServiceResult.Failure(MessageDescriber.AccountLockedOut(lockoutEnd.Value));
             }
 
-            if (!result.Succeeded) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.PasswordMismatch());
+            if (!result.Succeeded) return ServiceResult.Failure(MessageDescriber.PasswordMismatch());
 
             var cookieOptions = new CookieOptions
             {
@@ -51,37 +51,37 @@ namespace TaskFlow.Service.Services.Authentication
             string? token = _tokenService.CreateToken(user);
             var httpContext = _httpContextAccessor.HttpContext;
 
-            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
+            if (token == null || httpContext == null) return ServiceResult.Failure(MessageDescriber.DefaultError());
 
             httpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
 
             var userDto = new AuthResponseDto
             {
-                UserName = user.UserName,
+                Username = user.UserName,
             };
 
-            return ServiceResult<AuthResponseDto>.Success(userDto);
+            return ServiceResult.Success(userDto);
         }
 
-        public async Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterAttemptDto registerAttempt)
+        public async Task<ServiceResult> RegisterAsync(RegisterAttemptDto registerAttempt)
         {
-            if (await _userManager.Users.AnyAsync(x => x.UserName == registerAttempt.UserName))
-                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DuplicateUsername(registerAttempt.UserName));
+            if (await _userManager.Users.AnyAsync(x => x.UserName == registerAttempt.Username))
+                return ServiceResult.Failure(MessageDescriber.DuplicateUsername(registerAttempt.Username));
 
             if (await _userManager.Users.AnyAsync(x => x.Email == registerAttempt.Email))
-                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DuplicateEmail(registerAttempt.Email));
+                return ServiceResult.Failure(MessageDescriber.DuplicateEmail(registerAttempt.Email));
 
             var user = new AppUser
             {
                 Email = registerAttempt.Email,
-                UserName = registerAttempt.UserName,
+                UserName = registerAttempt.Username,
             };
             var result = await _userManager.CreateAsync(user, registerAttempt.Password);
 
             if (!result.Succeeded && result.Errors.Any())
             {
                 string errorMessage = result.Errors.First().Description;
-                return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.RegistrationError(errorMessage));
+                return ServiceResult.Failure(MessageDescriber.RegistrationError(errorMessage));
             }
 
             var cookieOptions = new CookieOptions
@@ -95,19 +95,19 @@ namespace TaskFlow.Service.Services.Authentication
             string? token = _tokenService.CreateToken(user);
             var httpContext = _httpContextAccessor.HttpContext;
 
-            if (token == null || httpContext == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
+            if (token == null || httpContext == null) return ServiceResult.Failure(MessageDescriber.DefaultError());
 
             httpContext.Response.Cookies.Append("AuthToken", token, cookieOptions);
 
             var userDto = new AuthResponseDto
             {
-                UserName = user.UserName,
+                Username = user.UserName,
             };
 
-            return ServiceResult<AuthResponseDto>.Success(userDto);
+            return ServiceResult.Success(userDto);
         }
 
-        public ServiceResult<AuthResponseDto> Logout()
+        public ServiceResult Logout()
         {
             var cookieOptions = new CookieOptions
             {
@@ -119,24 +119,24 @@ namespace TaskFlow.Service.Services.Authentication
 
             var httpContext = _httpContextAccessor.HttpContext;
 
-            if (httpContext == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.DefaultError());
+            if (httpContext == null) return ServiceResult.Failure(MessageDescriber.DefaultError());
 
             httpContext.Response.Cookies.Append("AuthToken", "", cookieOptions);
 
             var userDto = new AuthResponseDto();
 
-            return ServiceResult<AuthResponseDto>.Success(userDto);
+            return ServiceResult.Success(userDto);
         }
 
-        public async Task<ServiceResult<AuthResponseDto>> GetUserByEmail(string email)
+        public async Task<ServiceResult> GetUserByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null) return ServiceResult<AuthResponseDto>.Failure(MessageDescriber.UserNotFound());
+            if (user == null) return ServiceResult.Failure(MessageDescriber.UserNotFound());
             AuthResponseDto userDto = new()
             {
-                UserName = user.UserName
+                Username = user.UserName
             };
-            return ServiceResult<AuthResponseDto>.Success(userDto);
+            return ServiceResult.Success(userDto);
         }
 
         public async Task<RefreshToken> SetRefreshToken(string userName)
@@ -148,20 +148,6 @@ namespace TaskFlow.Service.Services.Authentication
             appUser.RefreshTokens.Add(refreshToken);
             await _userManager.UpdateAsync(appUser);
             return refreshToken;
-        }
-
-        public ServiceResult<string> RefreshToken(AppUser user, string? refreshToken)
-        {
-            var oldToken = user.RefreshTokens.SingleOrDefault(x => x.Token == refreshToken);
-            if (oldToken != null && !oldToken.IsActive)
-                return ServiceResult<string>.Failure(MessageDescriber.Unauthenticated());
-
-            if (oldToken != null) oldToken.Revoked = DateTime.UtcNow;
-            var newToken = _tokenService.CreateToken(user);
-            if (newToken == null)
-                return ServiceResult<string>.Failure(MessageDescriber.Unauthenticated());
-
-            return ServiceResult<string>.Success(newToken);
         }
     }
 }

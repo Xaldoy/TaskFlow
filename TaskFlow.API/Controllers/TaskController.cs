@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Service.DTOs;
+using TaskFlow.Service.DTOs.Task;
 using TaskFlow.Service.Services.Tasks;
 
 namespace API.Controllers

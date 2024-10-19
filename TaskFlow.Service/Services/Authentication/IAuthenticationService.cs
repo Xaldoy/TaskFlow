@@ -1,17 +1,15 @@
 ﻿using Model.Models;
 using Service.DTOs.Auth;
 using Service.DTOs.Result;
-using TaskFlow.Service.DTOs.Auth;
 
 namespace TaskFlow.Service.Services.Authentication
 {
     public interface IAuthenticationService
     {
-        Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginAttemptDto loginAttempt);
-        Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterAttemptDto registerAttempt);
-        ServiceResult<AuthResponseDto> Logout();
-        Task<ServiceResult<AuthResponseDto>> GetUserByEmail(string email);
+        Task<ServiceResult> LoginAsync(LoginAttemptDto loginAttempt);
+        Task<ServiceResult> RegisterAsync(RegisterAttemptDto registerAttempt);
+        ServiceResult Logout();
+        Task<ServiceResult> GetUserByEmail(string email);
         Task<RefreshToken> SetRefreshToken(string userName);
-        ServiceResult<string> RefreshToken(AppUser user, string? refreshToken);
     }
 }

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Model.Models;
-using Service.DTOs;
+using TaskFlow.Model.Models;
+using TaskFlow.Service.DTOs.Task;
+using TaskFlow.Service.DTOs.User;
 
 namespace Service.Mapping
 {
@@ -13,6 +15,12 @@ namespace Service.Mapping
             CreateMap<TaskItemDto, TaskItem>();
             CreateMap<TaskCategory, TaskCategoryDto>().ReverseMap();
             CreateMap<TaskPriority, TaskPriorityDto>().ReverseMap();
+            CreateMap<FriendRelation, AppUserDto>()
+                .ForMember(x => x.Username, opt => opt.MapFrom(x => x.User2.UserName));
+            CreateMap<FriendRelation, ReceivedFriendRequestDto>()
+                .ForMember(x => x.Username, opt => opt.MapFrom(x => x.User1.UserName));
+            CreateMap<FriendRelation, SentFriendRequestDto>()
+                .ForMember(x => x.Username, opt => opt.MapFrom(x => x.User2.UserName));
         }
     }
 }

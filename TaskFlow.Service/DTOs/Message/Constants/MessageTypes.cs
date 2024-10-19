@@ -1,7 +1,6 @@
-﻿using System.Xml.Schema;
-using TaskFlow.Service.DTOs.Error.Constants;
+﻿using TaskFlow.Service.DTOs.Message.Constants;
 
-namespace TaskFlow.Service.DTOs.Error
+namespace TaskFlow.Service.DTOs.Message
 {
     public class MessageTypes
     {

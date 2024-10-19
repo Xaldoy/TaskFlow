@@ -7,10 +7,12 @@ using Service.Mapping;
 using System.Threading.RateLimiting;
 using TaskFlow.DAL.Repositories.Authorization;
 using TaskFlow.DAL.Repositories.Tasks;
+using TaskFlow.DAL.Repositories.User;
 using TaskFlow.Service.Services;
 using TaskFlow.Service.Services.Authentication;
 using TaskFlow.Service.Services.Authorization;
 using TaskFlow.Service.Services.Tasks;
+using TaskFlow.Service.Services.User;
 
 namespace Service.Services
 {
@@ -42,6 +44,8 @@ namespace Service.Services
             services.AddScoped<ITaskRepository, TaskRepository>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
             services.AddScoped<IAuthorizationRepository, AuthorizationRepository>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
 
             services.AddAutoMapper(typeof(TaskProfile));

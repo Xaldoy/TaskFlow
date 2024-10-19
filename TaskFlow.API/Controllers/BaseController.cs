@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Service.DTOs.Error;
+using Service.DTOs.Message;
 using Service.DTOs.Result;
-using TaskFlow.Service.DTOs.Error;
+using TaskFlow.Service.DTOs.Message;
 
 namespace API.Controllers
 {
@@ -68,21 +68,14 @@ namespace API.Controllers
         }
 
         [NonAction]
-        public IActionResult HandleServiceResult<T>(ServiceResult<T> serviceResult)
+        public IActionResult HandleServiceResult(ServiceResult serviceResult)
         {
             if (serviceResult.Message != null && serviceResult.IsError) return MessageResult(serviceResult.Message);
             return Ok(serviceResult.Data);
         }
 
         [NonAction]
-        public IActionResult HandleServiceResult(ServiceResult serviceResult)
-        {
-            if (serviceResult.Message != null && serviceResult.IsError) return MessageResult(serviceResult.Message);
-            return MessageResult(MessageDescriber.DefaultError());
-        }
-
-        [NonAction]
-        public MessageResponse? GetModelStateError(MessageType? messageType = null )
+        public MessageResponse? GetModelStateError(MessageType? messageType = null)
         {
             if (!ModelState.IsValid && ModelState.Values.Any())
             {

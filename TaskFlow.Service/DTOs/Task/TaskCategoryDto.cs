@@ -1,6 +1,6 @@
-﻿namespace Service.DTOs
+﻿namespace TaskFlow.Service.DTOs.Task
 {
-    public class TaskCategoryDto
+    public class TaskCategoryDto : BaseDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;

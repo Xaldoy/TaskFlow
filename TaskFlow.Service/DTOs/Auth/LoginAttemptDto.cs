@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TaskFlow.Service.DTOs;
 
 namespace Service.DTOs.Auth
 {
-    public class LoginAttemptDto
+    public class LoginAttemptDto : BaseDto
     {
         [Required(ErrorMessage = "Credentials can't be empty")]
         public string Credentials { get; set; } = string.Empty;

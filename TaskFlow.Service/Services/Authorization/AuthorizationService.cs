@@ -1,55 +1,74 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Model.Models;
-using Service.DTOs.Result;
-using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 using TaskFlow.DAL.Repositories.Authorization;
-using TaskFlow.Service.DTOs.Error;
+using TaskFlow.Model.Models;
 
 namespace TaskFlow.Service.Services.Authorization
 {
     public class AuthorizationService(IHttpContextAccessor httpContextAccessor, IAuthorizationRepository authorizationRepository) : IAuthorizationService
     {
+        // This service should remain self-contained and must not inject any other services 
+        // to prevent potential circular dependencies.
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly IAuthorizationRepository _authorizationRepository = authorizationRepository;
+        private string UserId => GetUserId();
 
         public async Task<bool> UserOwnsTaskCategory(int taskCategoryId)
         {
-            ServiceResult<string> serviceResult = GetUserId();
             var category = await _authorizationRepository.GetTaskCategory(taskCategoryId);
-            return category != null && serviceResult.Data == category.OwnerId;
+            return category != null && UserId == category.OwnerId;
         }
 
         public bool UserOwnsTaskCategory(TaskCategory taskCategory)
         {
-            ServiceResult<string> serviceResult = GetUserId();
-            return serviceResult.Data == taskCategory.OwnerId;
+            return UserId == taskCategory.OwnerId;
         }
 
         public async Task<bool> UserOwnsTask(int taskItemId)
         {
-            ServiceResult<string> serviceResult = GetUserId();
             var task = await _authorizationRepository.GetTaskItem(taskItemId);
-            return task != null && serviceResult.Data == task.TaskCategory.OwnerId;
+            return task != null && UserId == task.TaskCategory.OwnerId;
         }
 
         public bool UserOwnsTask(TaskItem taskItem)
         {
-            ServiceResult<string> serviceResult = GetUserId();
-            return serviceResult.Data == taskItem.TaskCategory.OwnerId;
+            return UserId == taskItem.TaskCategory.OwnerId;
         }
 
-        public ServiceResult<string> GetUserId()
+        public string GetUserId()
         {
-            var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims
-            .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            var httpContext = _httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No HTTP context available.");
+            var token = httpContext.Request.Cookies["AuthToken"];
 
-            if (userIdClaim == null)
-            {
-                return ServiceResult<string>.Failure(MessageDescriber.Unauthenticated());
-            }
+            if (token == null) throw new UnauthorizedAccessException();
 
-            return ServiceResult<string>.Success(userIdClaim.Value);
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var jwt = jwtHandler.ReadJwtToken(token);
+            var claim = jwt.Claims.FirstOrDefault(claim => claim.Type == "nameid");
+            return claim == null ? throw new UnauthorizedAccessException() : claim.Value;
         }
 
+        public bool UserOwnsSentFriendRelation(FriendRelation friendRelation)
+        {
+            return UserId == friendRelation.User1Id;
+        }
+
+        public bool UserOwnsReceivedFriendRelation(FriendRelation friendRelation)
+        {
+            return UserId == friendRelation.User2Id;
+        }
+
+        public async Task<bool> UserOwnsSentFriendRelation(int friendRelationId)
+        {
+            var friendRelation = await _authorizationRepository.GetFriendRelation(friendRelationId);
+            return friendRelation != null && friendRelation.User1Id == UserId;
+        }
+
+        public async Task<bool> UserOwnsReceivedFriendRelation(int friendRelationId)
+        {
+            var friendRelation = await _authorizationRepository.GetFriendRelation(friendRelationId);
+            return friendRelation != null && friendRelation.User2Id == UserId;
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Model.Models;
-using Service.DTOs.Result;
+using TaskFlow.Model.Models;
 
 namespace TaskFlow.Service.Services.Authorization
 {
@@ -7,8 +7,16 @@ namespace TaskFlow.Service.Services.Authorization
     {
         Task<bool> UserOwnsTaskCategory(int taskCategoryId);
         bool UserOwnsTaskCategory(TaskCategory taskCategory);
+
         Task<bool> UserOwnsTask(int taskItemId);
         bool UserOwnsTask(TaskItem taskItem);
-        ServiceResult<string> GetUserId();
+
+        Task<bool> UserOwnsSentFriendRelation(int friendRelationId);
+        bool UserOwnsSentFriendRelation(FriendRelation friendRelation);
+
+        Task<bool> UserOwnsReceivedFriendRelation(int friendRelationId);
+        bool UserOwnsReceivedFriendRelation(FriendRelation friendRelation);
+
+        string GetUserId();
     }
 }

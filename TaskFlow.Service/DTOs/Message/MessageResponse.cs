@@ -1,6 +1,6 @@
-﻿using TaskFlow.Service.DTOs.Error;
+﻿using TaskFlow.Service.DTOs.Message;
 
-namespace Service.DTOs.Error
+namespace Service.DTOs.Message
 {
     public record MessageResponse(string Message, MessageCode MessageCode, MessageType MessageType);
 }

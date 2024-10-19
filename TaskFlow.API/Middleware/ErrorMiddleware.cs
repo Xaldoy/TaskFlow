@@ -1,4 +1,4 @@
-﻿using TaskFlow.Service.DTOs.Error;
+﻿using TaskFlow.Service.DTOs.Message;
 
 namespace API.Middleware
 {
@@ -17,13 +17,19 @@ namespace API.Middleware
             {
                 await _next(httpContext);
 
-                if (httpContext.Response.StatusCode == StatusCodes.Status405MethodNotAllowed)
+                if (httpContext.Response.StatusCode == StatusCodes.Status405MethodNotAllowed && !httpContext.Response.HasStarted)
                 {
-                    if (!httpContext.Response.HasStarted)
-                    {
-                        httpContext.Response.ContentType = "application/json";
-                        await httpContext.Response.WriteAsJsonAsync(MessageDescriber.MethodNotAllowed());
-                    }
+                    httpContext.Response.ContentType = "application/json";
+                    await httpContext.Response.WriteAsJsonAsync(MessageDescriber.MethodNotAllowed());
+                }
+            }
+            catch (UnauthorizedAccessException)
+            {
+                if (!httpContext.Response.HasStarted)
+                {
+                    httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    httpContext.Response.ContentType = "application/json";
+                    await httpContext.Response.WriteAsJsonAsync(MessageDescriber.Unauthorized());
                 }
             }
             catch (Exception ex)

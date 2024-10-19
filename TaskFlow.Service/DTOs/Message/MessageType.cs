@@ -1,4 +1,4 @@
-﻿namespace TaskFlow.Service.DTOs.Error
+﻿namespace TaskFlow.Service.DTOs.Message
 {
     public record MessageType(string Type, string Severity);
 }

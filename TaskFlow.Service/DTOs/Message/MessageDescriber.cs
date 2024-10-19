@@ -1,7 +1,6 @@
-﻿using Service.DTOs.Error;
-using TaskFlow.Service.DTOs.Error.Constants;
+﻿using Service.DTOs.Message;
 
-namespace TaskFlow.Service.DTOs.Error
+namespace TaskFlow.Service.DTOs.Message
 {
     public class MessageDescriber
     {
@@ -37,6 +36,6 @@ namespace TaskFlow.Service.DTOs.Error
         Unauthorized,
         InvalidModelState,
         MethodNotAllowed,
-        AccountLockedOut
+        AccountLockedOut,
     }
 }
