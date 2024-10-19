@@ -9,7 +9,7 @@ namespace TaskFlow.Service.Services.Authentication
     {
         Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginAttemptDto loginAttempt);
         Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterAttemptDto registerAttempt);
-        Task<ServiceResult<AuthResponseDto>> Logout();
+        ServiceResult<AuthResponseDto> Logout();
         Task<ServiceResult<AuthResponseDto>> GetUserByEmail(string email);
         Task<RefreshToken> SetRefreshToken(string userName);
         ServiceResult<string> RefreshToken(AppUser user, string? refreshToken);

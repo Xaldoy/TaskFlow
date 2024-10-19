@@ -26,6 +26,7 @@ namespace Service.Services
                 var origins = allowedHosts?.Split(';', StringSplitOptions.RemoveEmptyEntries)
                   ?? [];
 
+
                 opt.AddPolicy("CorsPolicy", policy =>
                 {
                     policy

@@ -88,7 +88,7 @@ namespace TaskFlow.Service.Services.Authentication
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddHours(6),
             };
 
@@ -107,7 +107,7 @@ namespace TaskFlow.Service.Services.Authentication
             return ServiceResult<AuthResponseDto>.Success(userDto);
         }
 
-        public async Task<ServiceResult<AuthResponseDto>> Logout()
+        public ServiceResult<AuthResponseDto> Logout()
         {
             var cookieOptions = new CookieOptions
             {

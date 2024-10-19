@@ -8,7 +8,6 @@ using Service.DTOs.Result;
 using System.Security.Claims;
 using TaskFlow.Service.DTOs.Auth;
 using TaskFlow.Service.DTOs.Error;
-using TaskFlow.Service.DTOs.Error.Constants;
 using TaskFlow.Service.Services.Authentication;
 
 namespace API.Controllers
@@ -46,9 +45,9 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            var serviceResult = await _authenticationService.Logout();
+            var serviceResult = _authenticationService.Logout();
             return HandleServiceResult(serviceResult);
         }
 
