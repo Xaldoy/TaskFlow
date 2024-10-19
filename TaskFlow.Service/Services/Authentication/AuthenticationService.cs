@@ -44,7 +44,7 @@ namespace TaskFlow.Service.Services.Authentication
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTime.UtcNow.AddHours(6),
             };
 
@@ -88,7 +88,7 @@ namespace TaskFlow.Service.Services.Authentication
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTime.UtcNow.AddHours(6),
             };
 
